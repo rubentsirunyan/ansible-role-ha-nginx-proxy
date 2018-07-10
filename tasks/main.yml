@@ -1,4 +1,9 @@
 ---
+- name: Install EPEL repo
+  yum:
+    name: epel-release
+    state: present
+  become: true
 - name: Install Nginx
   package:
     name: nginx
@@ -8,6 +13,7 @@
   template:
     src: nginx.conf.j2
     dest: nginx.conf
+  become: true
   notify: restart nginx
 - name: Configure HA
   include_role:
