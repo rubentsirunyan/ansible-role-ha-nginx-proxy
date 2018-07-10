@@ -1,11 +1,21 @@
 ---
+- name: Install Nginx
+  package:
+    name: nginx
+    state: present
+  become: true
+- name: Deploy reverse proxy configuration
+  template:
+    src: nginx.conf.j2
+    dest: nginx.conf
+  notify: restart nginx
 - name: Configure HA
   include_role:
     name: pacemaker
   vars:
     pacemaker_password: Alahamora
     pacemaker_cluster_name: nginx_cluster
-    pacemaker_hosts: {{ play_hosts }}
+    pacemaker_hosts: "{{ play_hosts }}"
     pacemaker_cluster_options:
       no-quorum-policy: ignore
       stonith-enabled: false
@@ -18,7 +28,7 @@
           provider: heartbeat
           type: IPaddr2
         options:
-          ip: {{ lb_virtual_ip }}
+          ip: "{{ lb_virtual_ip }}"
         op:
           - name: monitor
             interval: 5s
@@ -40,13 +50,3 @@
         then-action: start
         then: Nginx
         score: INFINITY
-- name: Install Nginx
-  package:
-    name: nginx
-    state: present
-  become: true
-- name: Deploy reverse proxy configuration
-  template:
-    src: nginx.conf.j2
-    dest: nginx.conf
-  notify: restart nginx
