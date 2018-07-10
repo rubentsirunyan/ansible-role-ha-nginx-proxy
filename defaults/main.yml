@@ -1,0 +1,6 @@
+---
+lb_listen_address: 127.0.0.1
+lb_listen_port: 6443
+lb_kube_masters:
+  - kbmaster01
+  - kbmaster02

@@ -1,0 +1,11 @@
+---
+- name: Install Nginx
+  package:
+    name: nginx
+    state: present
+  become: true
+- name: Deploy reverse proxy configuration
+  template:
+    src: nginx.conf.j2
+    dest: nginx.conf
+  notify: restart nginx

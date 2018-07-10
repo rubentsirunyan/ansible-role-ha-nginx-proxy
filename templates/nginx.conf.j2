@@ -1,0 +1,25 @@
+error_log stderr notice;
+
+worker_processes auto;
+events {
+  multi_accept on;
+  use epoll;
+  worker_connections 1024;
+}
+
+stream {
+        upstream kube_apiserver {
+            least_conn;
+	    {% for server in lb_kube_masters %}
+            server {{ server }}:6443;
+	    {% endfor %}
+        }
+
+        server {
+            listen        {{ lb_listen_address }}:{{ lb_listen_port }};
+            proxy_pass    kube_apiserver;
+            proxy_timeout 10m;
+            proxy_connect_timeout 1s;
+        }
+
+}
