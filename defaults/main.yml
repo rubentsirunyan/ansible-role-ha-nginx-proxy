@@ -4,3 +4,4 @@ lb_listen_port: 6443
 lb_kube_masters:
   - kbmaster01
   - kbmaster02
+lb_virtual_ip: 10.99.99.101

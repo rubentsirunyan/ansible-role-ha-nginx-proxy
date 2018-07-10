@@ -1,4 +1,45 @@
 ---
+- name: Configure HA
+  include_role:
+    name: pacemaker
+  vars:
+    pacemaker_password: Alahamora
+    pacemaker_cluster_name: nginx_cluster
+    pacemaker_hosts: {{ play_hosts }}
+    pacemaker_cluster_options:
+      no-quorum-policy: ignore
+      stonith-enabled: false
+    pacemaker_resource_defaults:
+      resource-stickiness: INFINITY
+    pacemaker_simple_resources:
+      VirtIP:
+        resource:
+          class: ocf
+          provider: heartbeat
+          type: IPaddr2
+        options:
+          ip: {{ lb_virtual_ip }}
+        op:
+          - name: monitor
+            interval: 5s
+      Nginx:
+        resource:
+          class: systemd
+          type: nginx
+        op:
+          - name: monitor
+            interval: 30s
+    pacemaker_constraints:
+      - type: colocation
+        rsc: Nginx
+        with-rsc: VirtIP
+        score: INFINITY
+      - type: order
+        first: VirtIP
+        first-action: start
+        then-action: start
+        then: Nginx
+        score: INFINITY
 - name: Install Nginx
   package:
     name: nginx
