@@ -1,2 +1,6 @@
 ---
-# handlers file for rubentsirunyan.nginx-proxy
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+  become: true
